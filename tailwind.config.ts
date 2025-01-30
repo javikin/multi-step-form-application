@@ -11,7 +11,7 @@ export default {
       colors: {
         primary: '#6042AA',
         secondary: '#f5f5f5',
-        gray: '#6b7280',
+        gray: '#D3D3D3',
         dark: '#111827',
         'gray-dark': '#424B54',
         'gray-light': '#666768',
@@ -35,12 +35,14 @@ export default {
         '26px': ['1.625rem', { lineHeight: '2rem' }],
       },
       spacing: {
+        2: '2px',
         4: '4px',
         6: '6px',
         8: '8px',
         12: '12px',
         14: '14px',
         16: '16px',
+        20: '20px',
         24: '24px',
         28: '28px',
         32: '32px',

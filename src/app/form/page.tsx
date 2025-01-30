@@ -5,26 +5,46 @@ import { useRouter } from 'next/navigation';
 import { AnswerValue, useFormContext } from '@/context/FormContext';
 import SingleChoiceQuestion from '@/components/SingleChoiceQuestion';
 import MultipleChoiceQuestion from '@/components/MultipleChoiceQuestion';
-import questions from '@/mock/questions.json';
+import ProgressHeader from '@/components/ProgressHeader';
 
 const Form = () => {
   const router = useRouter();
-  const { state, dispatch } = useFormContext();
-
-  const currentQuestion = questions[state.currentStep - 1];
+  const {
+    currentStep,
+    totalSteps,
+    getQuestion,
+    getAnswer,
+    setAnswer,
+    getCurrentRecommendation,
+    setSuggestedProduct,
+    setProcessCompleted,
+    nextStep,
+    prevStep,
+    isFormCompleted,
+    isProcessCompleted,
+  } = useFormContext();
+  const currentQuestion = getQuestion(currentStep);
 
   useEffect(() => {
-    if (!currentQuestion) {
+    if (!currentQuestion && isProcessCompleted) {
+      router.push('/recommendations');
+    } else if ((!currentQuestion && !isFormCompleted) || currentStep == 0) {
       router.push('/');
     }
-  }, [currentQuestion, router]);
+  }, [
+    currentQuestion,
+    isProcessCompleted,
+    isFormCompleted,
+    currentStep,
+    router,
+  ]);
 
   if (!currentQuestion) {
     return null;
   }
 
   const handleNext = () => {
-    const answer = state.answers[`step-${state.currentStep}`];
+    const answer = getAnswer(`step-${currentStep}`);
 
     if (
       (currentQuestion.type === 'single' && !answer) ||
@@ -34,56 +54,38 @@ const Form = () => {
       return;
     }
 
-    if (state.currentStep >= questions.length) {
-      const recommendation = calculateRecommendation(state.answers);
-      dispatch({ type: 'SET_SUGGESTED_PRODUCT', product: recommendation });
-      router.push('/recommendations');
+    if (isFormCompleted) {
+      const recommendation = getCurrentRecommendation();
+      setSuggestedProduct(recommendation);
+      setProcessCompleted(true);
+      nextStep();
     } else {
-      dispatch({ type: 'NEXT_STEP' });
+      nextStep();
     }
-  };
-
-  type RecommendationKey =
-    | 'minoxidil_caps'
-    | 'dutaxidil_gel'
-    | 'dutaxidil_caps';
-
-  const calculateRecommendation = (
-    answers: Record<string, AnswerValue>,
-  ): RecommendationKey => {
-    const medicalConditions = answers['step-3'] || [];
-    if (
-      medicalConditions.includes('cancer_mama') ||
-      medicalConditions.includes('cancer_prostata')
-    ) {
-      return 'minoxidil_caps';
-    }
-    if (medicalConditions.length > 0) {
-      return 'dutaxidil_gel';
-    }
-    return 'dutaxidil_caps';
   };
 
   const handleBack = () => {
-    dispatch({ type: 'PREV_STEP' });
-    if (state.currentStep == 0) {
+    prevStep();
+    if (currentStep == 0) {
       router.push('/');
     }
   };
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen space-y-6 bg-white">
+    <main className="flex flex-col h-screen bg-white">
+      <ProgressHeader
+        onBack={handleBack}
+        totalSteps={totalSteps}
+        currentStep={currentStep}
+      />
+
       {currentQuestion.type === 'single' && (
         <SingleChoiceQuestion
           question={currentQuestion.question}
           options={currentQuestion.options}
-          value={(state.answers[`step-${state.currentStep}`] as string) || ''}
+          value={(getAnswer(`step-${currentStep}`) as string) || ''}
           onChange={(value) =>
-            dispatch({
-              type: 'SET_ANSWER',
-              key: `step-${state.currentStep}`,
-              value,
-            })
+            setAnswer(`step-${currentStep}`, value as AnswerValue)
           }
         />
       )}
@@ -91,13 +93,9 @@ const Form = () => {
         <MultipleChoiceQuestion
           question={currentQuestion.question}
           options={currentQuestion.options}
-          values={(state.answers[`step-${state.currentStep}`] as []) || []}
+          values={(getAnswer(`step-${currentStep}`) as string[]) || []}
           onChange={(values) =>
-            dispatch({
-              type: 'SET_ANSWER',
-              key: `step-${state.currentStep}`,
-              value: values,
-            })
+            setAnswer(`step-${currentStep}`, values as AnswerValue)
           }
         />
       )}

@@ -1,20 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormContext } from '@/context/FormContext';
 
 const Welcome = () => {
   const router = useRouter();
-  const { dispatch } = useFormContext();
-
-  useEffect(() => {
-    dispatch({ type: 'RESET_STATE' });
-  }, [dispatch]);
+  const { nextStep } = useFormContext();
 
   const handleStart = () => {
-    dispatch({ type: 'NEXT_STEP' });
+    nextStep();
     router.push('/form');
   };
 
@@ -23,7 +18,7 @@ const Welcome = () => {
       <div className="w-full max-w-[430px] h-full shadow-md overflow-hidden">
         <div className="relative w-full">
           <Image
-            src="/images/welcome-hero.jpeg"
+            src="/images/welcome_hero.jpeg"
             alt="Bienvenido a Choiz"
             width={1920}
             height={1080}
@@ -53,7 +48,7 @@ const Welcome = () => {
               </span>
               <div className="ml-auto text-purple text-12px flex items-center">
                 <Image
-                  src="/images/clock-icon.png"
+                  src="/icons/icon_clock.svg"
                   alt="Clock"
                   width={10}
                   height={10}
@@ -66,7 +61,7 @@ const Welcome = () => {
             <li className="flex items-center space-x-4">
               <div className="flex flex-col items-center mr-2">
                 <Image
-                  src="/images/step-circle.png"
+                  src="/images/step_circle.png"
                   alt="Step 2"
                   width={14}
                   height={14}

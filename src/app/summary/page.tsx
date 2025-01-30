@@ -3,36 +3,49 @@
 import { useRouter } from 'next/navigation';
 import { useFormContext } from '@/context/FormContext';
 import { useEffect } from 'react';
-import questions from '@/mock/questions.json';
-import recommendations from '@/mock/recommendations.json';
+import ProgressHeader from '@/components/ProgressHeader';
 
 const Summary = () => {
-  const { state } = useFormContext();
+  const {
+    suggestedProduct,
+    questions,
+    getAnswer,
+    prevStep,
+    totalSteps,
+    currentStep,
+  } = useFormContext();
   const router = useRouter();
 
+  const handleBack = () => {
+    prevStep();
+    router.push('/recommendations');
+  };
+
   useEffect(() => {
-    if (!state.suggestedProduct) {
+    if (!suggestedProduct) {
       router.push('/');
     }
-  }, [state.suggestedProduct, router]);
-
-  const selectedRecommendation = recommendations.find(
-    (rec) => rec.key === state.suggestedProduct,
-  );
+  }, [suggestedProduct, router]);
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen space-y-6 bg-white">
+    <main className="flex flex-col h-screen bg-white">
+      <ProgressHeader
+        onBack={handleBack}
+        totalSteps={totalSteps}
+        currentStep={currentStep}
+      />
+
       <h1 className="text-xl font-bold text-gray-700">
         Resumen de tus respuestas
       </h1>
-      {selectedRecommendation && (
+      {suggestedProduct && (
         <div className="bg-gray-100 p-6 rounded-lg shadow-lg w-3/4">
           <h2 className="text-lg font-bold text-gray-800 mb-4">
             Producto seleccionado:
           </h2>
           <p className="text-gray-700">
-            <strong>{selectedRecommendation.title}</strong>:{' '}
-            {selectedRecommendation.description}
+            <strong>{suggestedProduct.title}</strong>:{' '}
+            {suggestedProduct.description}
           </p>
         </div>
       )}
@@ -40,7 +53,7 @@ const Summary = () => {
         <ul className="space-y-4">
           {questions.map((question, index) => {
             const answerKey = `step-${index + 1}`;
-            const answer = state.answers[answerKey];
+            const answer = getAnswer(answerKey);
 
             return (
               <li key={answerKey} className="text-gray-700">

@@ -5,33 +5,48 @@ import { useFormContext } from '@/context/FormContext';
 import FAQs from './faqs';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import recommendations from '@/mock/recommendations.json';
+import ProgressHeader from '@/components/ProgressHeader';
 
 const Recommendations = () => {
-  const { state } = useFormContext();
+  const {
+    suggestedProduct,
+    isFormCompleted,
+    isProcessCompleted,
+    totalSteps,
+    currentStep,
+    prevStep,
+    setProcessCompleted,
+  } = useFormContext();
   const router = useRouter();
 
   useEffect(() => {
-    if (!state.suggestedProduct) {
+    if (!isFormCompleted && !isProcessCompleted) {
       router.push('/');
     }
-  }, [state.suggestedProduct, router]);
-
-  const suggestedProduct = recommendations.find(
-    (rec) => rec.key === state.suggestedProduct,
-  );
-
-  if (!suggestedProduct) {
-    router.push('/');
-    return null;
-  }
+  }, [isFormCompleted, isProcessCompleted, router]);
 
   const handleSelect = () => {
     router.push('/summary');
   };
 
+  const handleBack = () => {
+    setProcessCompleted(false);
+    prevStep();
+    router.push('/form');
+  };
+
+  if (!suggestedProduct) {
+    return null;
+  }
+
   return (
-    <main className="flex flex-col items-center justify-center h-screen space-y-6 bg-white">
+    <main className="flex flex-col h-screen bg-white">
+      <ProgressHeader
+        onBack={handleBack}
+        totalSteps={totalSteps}
+        currentStep={currentStep}
+      />
+
       <h1 className="text-xl font-bold text-gray-700">
         Tratamiento recomendado en base a tus respuestas
       </h1>

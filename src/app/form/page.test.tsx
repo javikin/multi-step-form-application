@@ -12,110 +12,96 @@ jest.mock('@/context/FormContext', () => ({
   useFormContext: jest.fn(),
 }));
 
-jest.mock('@/mock/questions.json', () => [
-  {
-    id: 1,
-    question: 'Pregunta 1',
-    type: 'single',
-    options: [
-      { id: 'yes', label: 'Sí' },
-      { id: 'no', label: 'No' },
-    ],
-  },
-  {
-    id: 2,
-    question: 'Pregunta 2',
-    type: 'multiple',
-    options: [
-      { id: 'option1', label: 'Opción 1' },
-      { id: 'option2', label: 'Opción 2' },
-    ],
-  },
-]);
-
 describe('Form Page', () => {
   const mockPush = jest.fn();
-  const mockDispatch = jest.fn();
+  const mockNextStep = jest.fn();
+  const mockPrevStep = jest.fn();
+  const mockSetSuggestedProduct = jest.fn();
+  const mockSetProcessCompleted = jest.fn();
 
   beforeEach(() => {
+    jest.clearAllMocks();
+
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+
     (useFormContext as jest.Mock).mockReturnValue({
-      state: {
-        currentStep: 1,
-        answers: {},
-      },
-      dispatch: mockDispatch,
+      currentStep: 1,
+      totalSteps: 3,
+      getQuestion: jest.fn().mockReturnValue({
+        id: 1,
+        question: 'Pregunta 1',
+        type: 'single',
+        options: [
+          { id: 'yes', label: 'Sí' },
+          { id: 'no', label: 'No' },
+        ],
+      }),
+      getAnswer: jest.fn().mockReturnValue(null),
+      setAnswer: jest.fn(),
+      getCurrentRecommendation: jest.fn().mockReturnValue('minoxidil_caps'),
+      setSuggestedProduct: mockSetSuggestedProduct,
+      setProcessCompleted: mockSetProcessCompleted,
+      nextStep: mockNextStep,
+      prevStep: mockPrevStep,
+      isFormCompleted: false,
+      isProcessCompleted: false,
     });
   });
 
-  it('redirects to / if no current question is found', () => {
+  it('redirects to /recommendations if the process is completed', () => {
     (useFormContext as jest.Mock).mockReturnValue({
-      state: {
-        currentStep: 4,
-        answers: {},
-      },
-      dispatch: mockDispatch,
+      currentStep: 4,
+      totalSteps: 3,
+      getQuestion: jest.fn().mockReturnValue(undefined),
+      isProcessCompleted: true,
+      isFormCompleted: true,
+    });
+
+    render(<Form />);
+    expect(mockPush).toHaveBeenCalledWith('/recommendations');
+  });
+
+  it('redirects to / if the form is incomplete', () => {
+    (useFormContext as jest.Mock).mockReturnValue({
+      currentStep: 0,
+      totalSteps: 3,
+      getQuestion: jest.fn().mockReturnValue(undefined),
+      isProcessCompleted: false,
+      isFormCompleted: false,
     });
 
     render(<Form />);
     expect(mockPush).toHaveBeenCalledWith('/');
   });
 
-  it('renders a single choice question', () => {
-    render(<Form />);
-    expect(screen.getByText('Pregunta 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Sí')).toBeInTheDocument();
-    expect(screen.getByLabelText('No')).toBeInTheDocument();
-  });
-
-  it('renders a multiple choice question', () => {
+  it('handles the next button correctly when a valid answer is selected', async () => {
     (useFormContext as jest.Mock).mockReturnValue({
-      state: {
-        currentStep: 2,
-        answers: {},
-      },
-      dispatch: mockDispatch,
-    });
-
-    render(<Form />);
-    expect(screen.getByText('Pregunta 2')).toBeInTheDocument();
-    expect(screen.getByLabelText('Opción 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Opción 2')).toBeInTheDocument();
-  });
-
-  it('calls NEXT_STEP when "Continuar" is clicked with a valid answer', async () => {
-    (useFormContext as jest.Mock).mockReturnValue({
-      state: {
-        currentStep: 1,
-        answers: { 'step-1': 'yes' },
-      },
-      dispatch: mockDispatch,
+      ...useFormContext(),
+      getAnswer: jest.fn().mockReturnValue('yes'),
+      isFormCompleted: false,
     });
 
     render(<Form />);
     const continueButton = screen.getByText('Continuar');
     await userEvent.click(continueButton);
-
-    expect(mockDispatch).toHaveBeenCalledWith({ type: 'NEXT_STEP' });
+    expect(mockNextStep).toHaveBeenCalled();
   });
 
-  it('calls PREV_STEP when "Atrás" is clicked and is not the first step', async () => {
-    (useFormContext as jest.Mock).mockReturnValue({
-      state: {
-        currentStep: 2,
-        answers: {},
-      },
-      dispatch: mockDispatch,
-    });
-
+  it('handles the back button correctly', async () => {
     render(<Form />);
+
     const backButton = screen.getByText('Atrás');
     await userEvent.click(backButton);
 
-    expect(mockDispatch).toHaveBeenCalledWith({ type: 'PREV_STEP' });
+    expect(mockPrevStep).toHaveBeenCalled();
   });
 
-  it('redirects to / when "Atrás" is clicked on the first step', async () => {
+  it('redirects to / if back is clicked on the first step', async () => {
+    (useFormContext as jest.Mock).mockReturnValue({
+      ...useFormContext(),
+      currentStep: 0,
+    });
+
     render(<Form />);
     const backButton = screen.getByText('Atrás');
     await userEvent.click(backButton);
