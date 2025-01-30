@@ -1,8 +1,11 @@
-import "./globals.css";
-import { FormProvider } from "./context/FormContext";
+import './globals.css';
+import { FormProvider } from '../context/FormContext';
 
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>

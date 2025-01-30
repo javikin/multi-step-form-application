@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFormContext } from '@/app/context/FormContext';
+import { useFormContext } from '@/context/FormContext';
 import SingleChoiceQuestion from '@/components/SingleChoiceQuestion';
 import MultipleChoiceQuestion from '@/components/MultipleChoiceQuestion';
 import questions from '@/mock/questions.json';

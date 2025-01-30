@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { AnswerValue, useFormContext } from '@/app/context/FormContext';
+import { AnswerValue, useFormContext } from '@/context/FormContext';
 
 const Recommendations = () => {
   const { state } = useFormContext();

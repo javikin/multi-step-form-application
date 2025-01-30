@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
-import { useFormContext } from '@/app/context/FormContext';
+import { useFormContext } from '@/context/FormContext';
 import Form from './page';
 
 jest.mock('next/navigation', () => ({
