@@ -34,11 +34,10 @@ const Form = () => {
       return;
     }
 
-    dispatch({ type: 'NEXT_STEP' });
-
     if (state.currentStep >= questions.length) {
-      alert('Formulario completado.');
-      router.push('/');
+      router.push('/recommendations');
+    } else {
+      dispatch({ type: 'NEXT_STEP' });
     }
   };
 
