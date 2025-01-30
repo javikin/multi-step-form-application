@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
-import { FormProvider, useFormContext } from "./FormContext";
-import React from "react";
-import { act } from "@testing-library/react";
+import { render, screen } from '@testing-library/react';
+import { FormProvider, useFormContext } from './FormContext';
+import React from 'react';
+import { act } from '@testing-library/react';
 
 const TestComponent = () => {
   const { state, dispatch } = useFormContext();
@@ -9,31 +9,34 @@ const TestComponent = () => {
   return (
     <div>
       <div data-testid="currentStep">{state.currentStep}</div>
-      <button onClick={() => dispatch({ type: "NEXT_STEP" })}>Next Step</button>
+      <button onClick={() => dispatch({ type: 'PREV_STEP' })}>Prev Step</button>
+      <button onClick={() => dispatch({ type: 'NEXT_STEP' })}>Next Step</button>
     </div>
   );
 };
 
-test("initial state should have currentStep as 0", () => {
+test('initial state should have currentStep as 0', () => {
   render(
     <FormProvider>
       <TestComponent />
-    </FormProvider>
+    </FormProvider>,
   );
 
-  expect(screen.getByTestId("currentStep").textContent).toBe("0");
+  expect(screen.getByTestId('currentStep').textContent).toBe('0');
 });
 
-test("dispatch should navigate to the next step", () => {
+test('dispatch should navigate through steps', () => {
   render(
     <FormProvider>
       <TestComponent />
-    </FormProvider>
+    </FormProvider>,
   );
 
   act(() => {
-    screen.getByText("Next Step").click();
+    screen.getByText('Next Step').click();
+    screen.getByText('Next Step').click();
+    screen.getByText('Prev Step').click();
   });
 
-  expect(screen.getByTestId("currentStep").textContent).toBe("1");
+  expect(screen.getByTestId('currentStep').textContent).toBe('1');
 });

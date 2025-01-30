@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "question": "¿Tienes algún problema en el cuero cabelludo?",    
+    "type": "multiple",
+    "options": [
+      { "id": "pain", "label": "Dolor repentino y/o enrojecimiento" },
+      { "id": "dandruff", "label": "Caspa" },
+      { "id": "psoriasis", "label": "Psoriasis" },
+      { "id": "burn", "label": "Quemadura de sol" },
+      { "id": "other", "label": "Otro", "requiresInput": true },
+      { "id": "none", "label": "No, ninguno de los anteriores" }
+    ]
+  },
+  {
+    "id": 2,
+    "question": "¿Hay antecedentes de caída del cabello en tu familia?",    
+    "type": "single",
+    "options": [
+      { "id": "no", "label": "No" },
+      { "id": "yes", "label": "Sí" },
+      { "id": "unsure", "label": "No estoy seguro" }
+    ]
+  },
+  {
+    "id": 3,
+    "question": "¿Tienes o has tenido alguna de las siguientes condiciones médicas?",    
+    "type": "multiple",
+    "options": [
+      { "id": "cancer_mama", "label": "Cáncer de mama" },
+      { "id": "cancer_prostata", "label": "Cáncer de próstata" },
+      { "id": "low_pressure", "label": "Presión arterial baja incontrolada" },
+      { "id": "autoimmune", "label": "Otras enfermedades autoinmunes o reumáticas" },
+      { "id": "thyroid", "label": "Problemas de tiroides" },
+      { "id": "heart", "label": "Enfermedades del corazón" },
+      { "id": "kidney", "label": "Enfermedades de riñón o hígado" },
+      { "id": "none", "label": "No, ninguna de las anteriores" }
+    ]
+  },
+  {
+    "id": 4,
+    "question": "¿Tienes o has tenido alguna de estas condiciones de salud mental?",
+    "type": "multiple",
+    "options": [
+      { "id": "depression", "label": "Depresión" },
+      { "id": "bipolar", "label": "Desorden de bipolaridad" },
+      { "id": "anxiety", "label": "Ansiedad" },
+      { "id": "panic", "label": "Ataques de pánico" },
+      { "id": "ptsd", "label": "Desorden de estrés postraumático" },
+      { "id": "schizophrenia", "label": "Esquizofrenia" },
+      { "id": "none", "label": "No, ninguna de las anteriores" }
+    ]
+  }
+]
