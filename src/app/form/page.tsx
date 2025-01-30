@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFormContext } from '@/context/FormContext';
+import { AnswerValue, useFormContext } from '@/context/FormContext';
 import SingleChoiceQuestion from '@/components/SingleChoiceQuestion';
 import MultipleChoiceQuestion from '@/components/MultipleChoiceQuestion';
 import questions from '@/mock/questions.json';
@@ -35,10 +35,33 @@ const Form = () => {
     }
 
     if (state.currentStep >= questions.length) {
+      const recommendation = calculateRecommendation(state.answers);
+      dispatch({ type: 'SET_SUGGESTED_PRODUCT', product: recommendation });
       router.push('/recommendations');
     } else {
       dispatch({ type: 'NEXT_STEP' });
     }
+  };
+
+  type RecommendationKey =
+    | 'minoxidil_caps'
+    | 'dutaxidil_gel'
+    | 'dutaxidil_caps';
+
+  const calculateRecommendation = (
+    answers: Record<string, AnswerValue>,
+  ): RecommendationKey => {
+    const medicalConditions = answers['step-3'] || [];
+    if (
+      medicalConditions.includes('cancer_mama') ||
+      medicalConditions.includes('cancer_prostata')
+    ) {
+      return 'minoxidil_caps';
+    }
+    if (medicalConditions.length > 0) {
+      return 'dutaxidil_gel';
+    }
+    return 'dutaxidil_caps';
   };
 
   const handleBack = () => {

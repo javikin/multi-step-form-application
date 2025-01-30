@@ -5,6 +5,7 @@ import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 interface FormState {
   currentStep: number;
   answers: Record<string, AnswerValue>;
+  suggestedProduct: string | null;
 }
 
 export type AnswerValue = string | string[] | null;
@@ -17,12 +18,15 @@ interface FormContextProps {
 const initialState: FormState = {
   currentStep: 0,
   answers: {},
+  suggestedProduct: null,
 };
 
 type Action =
   | { type: 'SET_ANSWER'; key: string; value: AnswerValue }
   | { type: 'NEXT_STEP' }
-  | { type: 'PREV_STEP' };
+  | { type: 'PREV_STEP' }
+  | { type: 'RESET_STATE' }
+  | { type: 'SET_SUGGESTED_PRODUCT'; product: string };
 
 const formReducer = (state: FormState, action: Action): FormState => {
   switch (action.type) {
@@ -35,6 +39,10 @@ const formReducer = (state: FormState, action: Action): FormState => {
       return { ...state, currentStep: state.currentStep + 1 };
     case 'PREV_STEP':
       return { ...state, currentStep: Math.max(0, state.currentStep - 1) };
+    case 'RESET_STATE':
+      return { ...initialState };
+    case 'SET_SUGGESTED_PRODUCT':
+      return { ...state, suggestedProduct: action.product };
     default:
       return state;
   }

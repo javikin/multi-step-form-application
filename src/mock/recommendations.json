@@ -1,0 +1,20 @@
+[
+  {
+    "key": "minoxidil_caps",
+    "title": "DUTAXIDIL® Cápsulas",
+    "description": "Dutasterida 0.5 mg + Minoxidil 2.5 mg + Biotina 2.5 mg",
+    "image": "/images/dutaxidil_caps.png"
+  },
+  {
+    "key": "dutaxidil_gel",
+    "title": "DUTAXIDIL® Gel",
+    "description": "Dutasterida 0.1% + Minoxidil 5% + Tretinoína 1% + Hidrocortisona 1%",
+    "image": "/images/dutaxidil_gel.png"
+  },
+  {
+    "key": "dutaxidil_caps",
+    "title": "Minoxidil® Cápsulas",
+    "description": "Minoxidil 2.5 mg + Biotina 2.5 mg",
+    "image": "/images/minoxidil_caps.png"
+  }
+]

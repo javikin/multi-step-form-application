@@ -8,7 +8,7 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock('@/app/context/FormContext', () => ({
+jest.mock('@/context/FormContext', () => ({
   useFormContext: jest.fn(),
 }));
 
