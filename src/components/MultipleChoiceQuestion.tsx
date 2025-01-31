@@ -88,6 +88,7 @@ const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
             />
             <label
               htmlFor={option.id}
+              data-testid={`label-${option.id}`}
               className={`flex-grow cursor-pointer text-gray-dark`}
             >
               {option.label}
