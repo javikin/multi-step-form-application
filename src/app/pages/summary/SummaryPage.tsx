@@ -1,11 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useFormContext } from '@/context/FormContext';
-import { useEffect } from 'react';
 import ProgressHeader from '@/components/ProgressHeader';
 
-const Summary = () => {
+const SummaryPage = () => {
   const {
     suggestedProduct,
     questions,
@@ -14,18 +12,10 @@ const Summary = () => {
     totalSteps,
     currentStep,
   } = useFormContext();
-  const router = useRouter();
 
   const handleBack = () => {
     prevStep();
-    router.push('/recommendations');
   };
-
-  useEffect(() => {
-    if (!suggestedProduct) {
-      router.push('/');
-    }
-  }, [suggestedProduct, router]);
 
   return (
     <main className="flex flex-col h-screen bg-white">
@@ -78,4 +68,4 @@ const Summary = () => {
   );
 };
 
-export default Summary;
+export default SummaryPage;

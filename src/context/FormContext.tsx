@@ -6,11 +6,13 @@ import React, {
   useContext,
   ReactNode,
   useMemo,
+  useCallback,
 } from 'react';
 
 // TODO: Replace with hooks services
 import questions from '@/mock/questions.json';
 import recommendations from '@/mock/recommendations.json';
+import { useRouter } from 'next/navigation';
 
 export type AnswerValue = string | string[] | null;
 
@@ -38,37 +40,33 @@ interface FormState {
   currentStep: number;
   answers: Record<string, AnswerValue>;
   suggestedProduct: string | undefined;
-  isProcessCompleted: boolean;
 }
 
 interface FormContextProps {
   nextStep: () => void;
   prevStep: () => void;
+  updateStep: (step: number) => void;
   resetState: () => void;
-  setSuggestedProduct: (productKey?: string) => void;
   getQuestion: (step: number) => Question | undefined;
   setAnswer: (key: string, value: AnswerValue) => void;
   getAnswer: (key: string) => AnswerValue;
-  getCurrentRecommendation: () => RecommendationKey;
-  setProcessCompleted: (value: boolean) => void;
   questions: Question[];
   currentStep: number;
   totalSteps: number;
   suggestedProduct: Recommendation | undefined;
   isFormCompleted: boolean;
-  isProcessCompleted: boolean;
 }
 
 const initialState: FormState = {
   currentStep: 0,
   answers: {},
   suggestedProduct: undefined,
-  isProcessCompleted: false,
 };
 
 type Action =
   | { type: 'SET_ANSWER'; key: string; value: AnswerValue }
   | { type: 'NEXT_STEP' }
+  | { type: 'UPDATE_STEP'; step: number }
   | { type: 'PREV_STEP' }
   | { type: 'RESET_STATE' }
   | { type: 'SET_SUGGESTED_PRODUCT'; product?: string }
@@ -85,12 +83,10 @@ const formReducer = (state: FormState, action: Action): FormState => {
       return { ...state, currentStep: state.currentStep + 1 };
     case 'PREV_STEP':
       return { ...state, currentStep: Math.max(0, state.currentStep - 1) };
+    case 'UPDATE_STEP':
+      return { ...state, currentStep: action.step };
     case 'RESET_STATE':
       return { ...initialState };
-    case 'SET_SUGGESTED_PRODUCT':
-      return { ...state, suggestedProduct: action.product };
-    case 'SET_PROCESS_COMPLETED':
-      return { ...state, isProcessCompleted: action.value };
     default:
       return state;
   }
@@ -101,26 +97,27 @@ const FormContext = createContext<FormContextProps | undefined>(undefined);
 export const FormProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const { push } = useRouter();
   const [state, dispatch] = useReducer(formReducer, initialState);
 
-  const nextStep = () => dispatch({ type: 'NEXT_STEP' });
-  const prevStep = () => dispatch({ type: 'PREV_STEP' });
+  const nextStep = () => {
+    // dispatch({ type: 'NEXT_STEP' });
+    push(`?step=${state.currentStep + 1}`);
+  };
+  const prevStep = () => {
+    // dispatch({ type: 'PREV_STEP' });
+    push(`?step=${state.currentStep - 1}`);
+  };
+  const updateStep = (step: number) => dispatch({ type: 'UPDATE_STEP', step });
   const resetState = () => dispatch({ type: 'RESET_STATE' });
-  const setSuggestedProduct = (product?: string) =>
-    dispatch({ type: 'SET_SUGGESTED_PRODUCT', product });
   const getQuestion = (step: number) => questions.find((q) => q.id === step);
-
   const setAnswer = (key: string, value: AnswerValue) =>
     dispatch({ type: 'SET_ANSWER', key, value });
-  const getAnswer = (key: string) => state.answers[key];
-
-  const setProcessCompleted = (value: boolean) =>
-    dispatch({ type: 'SET_PROCESS_COMPLETED', value });
 
   const currentStep = state.currentStep;
 
   const totalSteps = useMemo(
-    () => questions.length + 1, // Extra step for recommendations page
+    () => questions.length + 2, // +1 recommendations and +1 summary
     [],
   );
 
@@ -129,14 +126,14 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({
     [state.answers],
   );
 
-  const suggestedProduct = useMemo(
-    () => recommendations.find((rec) => rec.key === state.suggestedProduct),
-    [state.suggestedProduct],
+  const getAnswer = useCallback(
+    (key: string): AnswerValue => {
+      return state.answers[key] || null;
+    },
+    [state.answers],
   );
 
-  const isProcessCompleted = state.isProcessCompleted;
-
-  const getCurrentRecommendation = (): RecommendationKey => {
+  const getCurrentRecommendation = useCallback((): RecommendationKey => {
     const medicalConditions = getAnswer('step-3') || [];
     if (
       medicalConditions.includes('cancer_mama') ||
@@ -148,26 +145,28 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({
       return 'dutaxidil_gel';
     }
     return 'dutaxidil_caps';
-  };
+  }, [getAnswer]);
+
+  const suggestedProduct = useMemo(
+    () => recommendations.find((rec) => rec.key === getCurrentRecommendation()),
+    [getCurrentRecommendation],
+  );
 
   return (
     <FormContext.Provider
       value={{
         nextStep,
         prevStep,
+        updateStep,
         resetState,
-        setSuggestedProduct,
         getQuestion,
         setAnswer,
         getAnswer,
-        getCurrentRecommendation,
-        setProcessCompleted,
         currentStep,
         totalSteps,
         suggestedProduct,
         questions,
         isFormCompleted,
-        isProcessCompleted,
       }}
     >
       {children}

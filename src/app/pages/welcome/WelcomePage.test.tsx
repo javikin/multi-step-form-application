@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
-import Welcome from './page';
-import { FormProvider } from '../context/FormContext';
+import WelcomePage from './WelcomePage';
+import { FormProvider } from '@/context/FormContext';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -15,12 +15,12 @@ describe('Welcome Page', () => {
 
     render(
       <FormProvider>
-        <Welcome />
+        <WelcomePage />
       </FormProvider>,
     );
 
     const button = screen.getByRole('button', { name: 'Continuar' });
     await userEvent.click(button);
-    expect(mockPush).toHaveBeenCalledWith('/form');
+    expect(mockPush).toHaveBeenCalledWith('?step=1');
   });
 });

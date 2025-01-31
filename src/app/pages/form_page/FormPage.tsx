@@ -1,43 +1,21 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { AnswerValue, useFormContext } from '@/context/FormContext';
 import SingleChoiceQuestion from '@/components/SingleChoiceQuestion';
 import MultipleChoiceQuestion from '@/components/MultipleChoiceQuestion';
 import ProgressHeader from '@/components/ProgressHeader';
 
-const Form = () => {
-  const router = useRouter();
+const FormPage = () => {
   const {
     currentStep,
     totalSteps,
     getQuestion,
     getAnswer,
     setAnswer,
-    getCurrentRecommendation,
-    setSuggestedProduct,
-    setProcessCompleted,
-    nextStep,
     prevStep,
-    isFormCompleted,
-    isProcessCompleted,
+    nextStep,
   } = useFormContext();
   const currentQuestion = getQuestion(currentStep);
-
-  useEffect(() => {
-    if (!currentQuestion && isProcessCompleted) {
-      router.push('/recommendations');
-    } else if ((!currentQuestion && !isFormCompleted) || currentStep == 0) {
-      router.push('/');
-    }
-  }, [
-    currentQuestion,
-    isProcessCompleted,
-    isFormCompleted,
-    currentStep,
-    router,
-  ]);
 
   if (!currentQuestion) {
     return null;
@@ -54,21 +32,11 @@ const Form = () => {
       return;
     }
 
-    if (isFormCompleted) {
-      const recommendation = getCurrentRecommendation();
-      setSuggestedProduct(recommendation);
-      setProcessCompleted(true);
-      nextStep();
-    } else {
-      nextStep();
-    }
+    nextStep();
   };
 
   const handleBack = () => {
     prevStep();
-    if (currentStep == 0) {
-      router.push('/');
-    }
   };
 
   return (
@@ -101,12 +69,6 @@ const Form = () => {
       )}
       <div className="flex space-x-4">
         <button
-          onClick={handleBack}
-          className="px-4 py-2 bg-gray-300 text-gray-700 font-semibold"
-        >
-          Atrás
-        </button>
-        <button
           onClick={handleNext}
           className="px-4 py-2 bg-blue-500 text-white font-semibold"
         >
@@ -117,4 +79,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default FormPage;

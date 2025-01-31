@@ -3,41 +3,23 @@
 import Image from 'next/image';
 import { useFormContext } from '@/context/FormContext';
 import FAQs from './faqs';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import ProgressHeader from '@/components/ProgressHeader';
 
-const Recommendations = () => {
-  const {
-    suggestedProduct,
-    isFormCompleted,
-    isProcessCompleted,
-    totalSteps,
-    currentStep,
-    prevStep,
-    setProcessCompleted,
-  } = useFormContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isFormCompleted && !isProcessCompleted) {
-      router.push('/');
-    }
-  }, [isFormCompleted, isProcessCompleted, router]);
-
-  const handleSelect = () => {
-    router.push('/summary');
-  };
-
-  const handleBack = () => {
-    setProcessCompleted(false);
-    prevStep();
-    router.push('/form');
-  };
+const RecommendationsPage = () => {
+  const { suggestedProduct, totalSteps, currentStep, prevStep, nextStep } =
+    useFormContext();
 
   if (!suggestedProduct) {
     return null;
   }
+
+  const handleSelect = () => {
+    nextStep();
+  };
+
+  const handleBack = () => {
+    prevStep();
+  };
 
   return (
     <main className="flex flex-col h-screen bg-white">
@@ -74,4 +56,4 @@ const Recommendations = () => {
   );
 };
 
-export default Recommendations;
+export default RecommendationsPage;
