@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multi-Step Form Application
 
-## Getting Started
+This project is a form-based web application built with Next.js. It was developed as part of a technical challenge for a job interview to showcase frontend development skills, state management, and testing.
 
-First, run the development server:
+## Project Features
+
+- **Dynamic Form Handling**:  
+  Supports single and multiple-choice questions, including options for custom answers using "Other" inputs.
+
+- **State Management**:  
+  Utilizes React Context to manage form navigation and preserve answers across multiple steps.
+
+- **Testing**:  
+  Implements unit tests with Jest and end-to-end tests with Cypress to ensure the application is reliable and robust.
+
+- **Responsive Design**:  
+  Fully optimized for both desktop and mobile devices.
+
+### Prerequisites
+
+- [Node.js v20](https://nodejs.org/) (Recommended: use [nvm](https://github.com/nvm-sh/nvm) to manage Node versions)
+- [npm](https://www.npmjs.com/)
+
+If you use **nvm**, you can install and use Node.js v20 with the following commands:
+
+```bash
+nvm install 20
+nvm use 20
+```
+
+### Installation
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/javikin/multi-step-form-application.git
+cd multi-step-form-application
+```
+
+2. **Install dependencies:**
+   Using npm:
+
+```bash
+npm install
+```
+
+### Running the Application
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Running Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Unit Tests (Jest):**
 
-## Learn More
+```bash
+npx jest
+# or run in watch mode:
+npx jest --watch
+```
 
-To learn more about Next.js, take a look at the following resources:
+**End-to-End Tests (Cypress):**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx cypress open
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+- `src/app/`: Contains the Next.js application files, including the main form page.
+- `src/components/`: Contains reusable React components used throughout the application.
+- `src/context/`: Holds the React Contexts for state management.
+- `hook/`: Contains network service React hooks.
+- `mock/`: Contains network mock data.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Technologies Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/)
+- React Context API
+- [Jest](https://jestjs.io/)
+- [Cypress](https://www.cypress.io/)
+- [Vercel](https://vercel.com/)
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
