@@ -52,29 +52,34 @@ const FormPage = () => {
           question={currentQuestion.question}
           options={currentQuestion.options}
           value={(getAnswer(`step-${currentStep}`) as string) || ''}
-          onChange={(value) =>
-            setAnswer(`step-${currentStep}`, value as AnswerValue)
-          }
+          onChange={(value) => {
+            setAnswer(`step-${currentStep}`, value as AnswerValue);
+            nextStep();
+          }}
         />
       )}
       {currentQuestion.type === 'multiple' && (
-        <MultipleChoiceQuestion
-          question={currentQuestion.question}
-          options={currentQuestion.options}
-          values={(getAnswer(`step-${currentStep}`) as string[]) || []}
-          onChange={(values) =>
-            setAnswer(`step-${currentStep}`, values as AnswerValue)
-          }
-        />
+        <>
+          <div className="flex-1 overflow-y-auto px-4">
+            <MultipleChoiceQuestion
+              question={currentQuestion.question}
+              options={currentQuestion.options}
+              values={(getAnswer(`step-${currentStep}`) as string[]) || []}
+              onChange={(values) =>
+                setAnswer(`step-${currentStep}`, values as AnswerValue)
+              }
+            />
+          </div>
+          <div className="sticky bottom-0 bg-white px-16 py-40">
+            <button
+              onClick={handleNext}
+              className="w-full px-12 py-18 bg-dark text-white rounded-lg"
+            >
+              Continuar
+            </button>
+          </div>
+        </>
       )}
-      <div className="flex space-x-4">
-        <button
-          onClick={handleNext}
-          className="px-4 py-2 bg-blue-500 text-white font-semibold"
-        >
-          Continuar
-        </button>
-      </div>
     </main>
   );
 };
