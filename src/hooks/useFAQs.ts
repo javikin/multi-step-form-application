@@ -20,8 +20,12 @@ export const useFAQs = (url: string) => {
         }
         const data = await response.json();
         setFAQs(data);
-      } catch (error: any) {
-        setError(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError(String(error));
+        }
       } finally {
         setLoading(false);
       }
