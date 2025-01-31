@@ -15,8 +15,8 @@ const ProgressHeader: React.FC<ProgressHeaderProps> = ({
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="sticky top-0 z-10">
-      <header className="relative flex items-center justify-between bg-white mx-16 pt-16  pb-20">
+    <div className="sticky top-0 z-10 bg-white">
+      <header className="relative flex items-center justify-between mx-16 pt-16  pb-20">
         <button onClick={onBack}>
           <Image
             src="/icons/arrow_left.svg"

@@ -24,7 +24,11 @@ const SingleChoiceQuestion: React.FC<SingleChoiceQuestionProps> = ({
         {question}
       </h2>
       {options.map((option) => (
-        <div key={option.id} className="flex items-center pt-16">
+        <div
+          key={option.id}
+          className={`flex mb-16 py-12 pl-20 border rounded 
+            ${value === option.id ? 'border-gray-light' : 'border-gray'}`}
+        >
           <input
             type="radio"
             id={option.id}
@@ -32,12 +36,13 @@ const SingleChoiceQuestion: React.FC<SingleChoiceQuestionProps> = ({
             value={option.id}
             checked={value === option.id}
             onChange={() => onChange(option.id)}
+            onClick={() => onChange(option.id)}
             className="hidden peer"
+            data-testid={`radio-${option.id}`}
           />
           <label
             htmlFor={option.id}
-            className={`block  w-full py-12 pl-20 pr-12 border rounded cursor-pointer transition-all bg-white text-gray-dark
-              ${value === option.id ? 'border-gray-light' : 'border-gray'}`}
+            className={`flex-grow cursor-pointer  text-gray-dark`}
           >
             {option.label}
           </label>

@@ -43,8 +43,8 @@ describe('SingleChoiceQuestion', () => {
   it('allows selecting a single option', async () => {
     render(<Wrapper />);
 
-    const noOption = screen.getByTestId('checkbox-no');
-    const yesOption = screen.getByTestId('checkbox-yes');
+    const noOption = screen.getByTestId('radio-no');
+    const yesOption = screen.getByTestId('radio-yes');
 
     await userEvent.click(noOption);
     expect(noOption).toBeChecked();

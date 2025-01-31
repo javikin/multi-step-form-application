@@ -2,17 +2,20 @@ import { render, screen } from '@testing-library/react';
 import { FormProvider, useFormContext } from './FormContext';
 import React from 'react';
 import { act } from '@testing-library/react';
-import questions from '@/mock/questions.json';
+import { useRouter } from 'next/navigation';
+
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+  })),
+}));
 
 const TestComponent = () => {
   const {
     nextStep,
     prevStep,
-    resetState,
     setAnswer,
     getAnswer,
-    setSuggestedProduct,
-    getCurrentRecommendation,
     currentStep,
     totalSteps,
     isFormCompleted,
@@ -31,14 +34,7 @@ const TestComponent = () => {
       </div>
       <button onClick={nextStep}>Next Step</button>
       <button onClick={prevStep}>Prev Step</button>
-      <button onClick={resetState}>Reset State</button>
       <button onClick={() => setAnswer('step-1', 'yes')}>Set Answer</button>
-      <button onClick={() => setSuggestedProduct('minoxidil_caps')}>
-        Set Product
-      </button>
-      <button onClick={() => getCurrentRecommendation()}>
-        Get Recommendation
-      </button>
       <div data-testid="answer">{getAnswer('step-1') || 'none'}</div>
     </div>
   );
@@ -57,6 +53,9 @@ describe('FormContext', () => {
   });
 
   test('nextStep and prevStep should navigate through steps', () => {
+    const pushMock = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
+
     render(
       <FormProvider>
         <TestComponent />
@@ -67,32 +66,13 @@ describe('FormContext', () => {
       screen.getByText('Next Step').click();
     });
 
-    expect(screen.getByTestId('currentStep').textContent).toBe('1');
+    expect(pushMock).toHaveBeenCalledWith('?step=1');
 
     act(() => {
       screen.getByText('Prev Step').click();
     });
 
-    expect(screen.getByTestId('currentStep').textContent).toBe('0');
-  });
-
-  test('resetState should reset all state values', () => {
-    render(
-      <FormProvider>
-        <TestComponent />
-      </FormProvider>,
-    );
-
-    act(() => {
-      screen.getByText('Next Step').click();
-      screen.getByText('Set Answer').click();
-      screen.getByText('Set Product').click();
-      screen.getByText('Reset State').click();
-    });
-
-    expect(screen.getByTestId('currentStep').textContent).toBe('0');
-    expect(screen.getByTestId('answer').textContent).toBe('none');
-    expect(screen.getByTestId('suggestedProduct').textContent).toBe('none');
+    expect(pushMock).toHaveBeenCalledWith('?step=-1');
   });
 
   test('setAnswer and getAnswer should update and retrieve answers', () => {
@@ -109,22 +89,6 @@ describe('FormContext', () => {
     expect(screen.getByTestId('answer').textContent).toBe('yes');
   });
 
-  test('setSuggestedProduct should set the suggested product', () => {
-    render(
-      <FormProvider>
-        <TestComponent />
-      </FormProvider>,
-    );
-
-    act(() => {
-      screen.getByText('Set Product').click();
-    });
-
-    expect(screen.getByTestId('suggestedProduct').textContent).toBe(
-      'Minoxidil® Cápsulas',
-    );
-  });
-
   test('totalSteps should be calculated correctly', () => {
     render(
       <FormProvider>
@@ -132,8 +96,6 @@ describe('FormContext', () => {
       </FormProvider>,
     );
 
-    expect(screen.getByTestId('totalSteps').textContent).toBe(
-      (questions.length + 1).toString(),
-    );
+    expect(screen.getByTestId('totalSteps').textContent).toBe('6'); // 4 questions from @questions json + 2 steps from recommendations and summary
   });
 });

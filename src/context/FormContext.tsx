@@ -7,6 +7,7 @@ import React, {
   ReactNode,
   useMemo,
   useCallback,
+  useState,
 } from 'react';
 
 // TODO: Replace with hooks services
@@ -46,7 +47,6 @@ interface FormContextProps {
   nextStep: () => void;
   prevStep: () => void;
   updateStep: (step: number) => void;
-  resetState: () => void;
   getQuestion: (step: number) => Question | undefined;
   setAnswer: (key: string, value: AnswerValue) => void;
   getAnswer: (key: string) => AnswerValue;
@@ -55,6 +55,8 @@ interface FormContextProps {
   totalSteps: number;
   suggestedProduct: Recommendation | undefined;
   isFormCompleted: boolean;
+  canContinue: boolean;
+  otherFieldErrors: Record<string, boolean>;
 }
 
 const initialState: FormState = {
@@ -65,12 +67,7 @@ const initialState: FormState = {
 
 type Action =
   | { type: 'SET_ANSWER'; key: string; value: AnswerValue }
-  | { type: 'NEXT_STEP' }
-  | { type: 'UPDATE_STEP'; step: number }
-  | { type: 'PREV_STEP' }
-  | { type: 'RESET_STATE' }
-  | { type: 'SET_SUGGESTED_PRODUCT'; product?: string }
-  | { type: 'SET_PROCESS_COMPLETED'; value: boolean };
+  | { type: 'UPDATE_STEP'; step: number };
 
 const formReducer = (state: FormState, action: Action): FormState => {
   switch (action.type) {
@@ -79,14 +76,8 @@ const formReducer = (state: FormState, action: Action): FormState => {
         ...state,
         answers: { ...state.answers, [action.key]: action.value },
       };
-    case 'NEXT_STEP':
-      return { ...state, currentStep: state.currentStep + 1 };
-    case 'PREV_STEP':
-      return { ...state, currentStep: Math.max(0, state.currentStep - 1) };
     case 'UPDATE_STEP':
       return { ...state, currentStep: action.step };
-    case 'RESET_STATE':
-      return { ...initialState };
     default:
       return state;
   }
@@ -101,15 +92,12 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({
   const [state, dispatch] = useReducer(formReducer, initialState);
 
   const nextStep = () => {
-    // dispatch({ type: 'NEXT_STEP' });
     push(`?step=${state.currentStep + 1}`);
   };
   const prevStep = () => {
-    // dispatch({ type: 'PREV_STEP' });
     push(`?step=${state.currentStep - 1}`);
   };
   const updateStep = (step: number) => dispatch({ type: 'UPDATE_STEP', step });
-  const resetState = () => dispatch({ type: 'RESET_STATE' });
   const getQuestion = (step: number) => questions.find((q) => q.id === step);
   const setAnswer = (key: string, value: AnswerValue) =>
     dispatch({ type: 'SET_ANSWER', key, value });
@@ -152,13 +140,49 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({
     [getCurrentRecommendation],
   );
 
+  const [otherFieldErrors, setOtherFieldErrors] = useState<
+    Record<string, boolean>
+  >({});
+
+  const canContinue = useMemo(() => {
+    const questionsToCheck = questions.filter((q) => q.id <= currentStep);
+
+    return questionsToCheck.every((q) => {
+      const answer = state.answers[`step-${q.id}`];
+
+      // Check if other field is filled
+      if (q.type === 'multiple' && Array.isArray(answer)) {
+        const isOtherSelected = answer.includes('other');
+        const otherValue = state.answers[`step-${q.id}-other`];
+
+        if (
+          isOtherSelected &&
+          (typeof otherValue !== 'string' || otherValue.trim() === '')
+        ) {
+          setOtherFieldErrors((prevErrors) => ({
+            ...prevErrors,
+            [`step-${q.id}`]: true,
+          }));
+          return false;
+        } else {
+          setOtherFieldErrors((prevErrors) => ({
+            ...prevErrors,
+            [`step-${q.id}`]: false,
+          }));
+        }
+      }
+
+      // Check if the answer is not empty
+      return Array.isArray(answer) ? answer.length > 0 : !!answer;
+    });
+  }, [currentStep, state.answers]);
+
   return (
     <FormContext.Provider
       value={{
         nextStep,
         prevStep,
         updateStep,
-        resetState,
         getQuestion,
         setAnswer,
         getAnswer,
@@ -167,6 +191,8 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({
         suggestedProduct,
         questions,
         isFormCompleted,
+        canContinue,
+        otherFieldErrors,
       }}
     >
       {children}

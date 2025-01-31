@@ -64,7 +64,7 @@ describe('Form Page', () => {
     expect(screen.getByLabelText('Opción 2')).toBeInTheDocument();
   });
 
-  it('calls nextStep when a valid answer is provided', async () => {
+  it('calls nextStep inmidiatly when a valid answer is provided in a single question', async () => {
     mockGetQuestion.mockReturnValue({
       id: 1,
       question: 'Pregunta 1',
@@ -79,9 +79,34 @@ describe('Form Page', () => {
 
     render(<FormPage />);
 
-    const continueButton = screen.getByText('Continuar');
-    await userEvent.click(continueButton);
+    const choice = screen.getByTestId('radio-yes');
+    await userEvent.click(choice);
 
     expect(mockNextStep).toHaveBeenCalled();
+  });
+
+  it('calls nextStep when a valid answer is provided and click on continue', async () => {
+    mockGetQuestion.mockReturnValue({
+      id: 2,
+      question: 'Pregunta 2',
+      type: 'multiple',
+      options: [
+        { id: 'option1', label: 'Opción 1' },
+        { id: 'option2', label: 'Opción 2' },
+      ],
+    });
+
+    mockGetAnswer.mockReturnValue(['option1']);
+
+    render(<FormPage />);
+
+    const checkbox = screen.getByTestId('checkbox-option1');
+    await userEvent.click(checkbox);
+
+    const continueButton = screen.getByText('Continuar');
+    expect(continueButton).toBeEnabled();
+
+    await userEvent.click(continueButton);
+    expect(mockNextStep).toHaveBeenCalledTimes(1);
   });
 });
