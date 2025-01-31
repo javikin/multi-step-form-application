@@ -1,5 +1,6 @@
 import './globals.css';
 import { FormProvider } from '../context/FormContext';
+import { Suspense } from 'react';
 
 export default function RootLayout({
   children,
@@ -9,7 +10,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <FormProvider>{children}</FormProvider>
+        <Suspense fallback={<div>Cargando...</div>}>
+          <FormProvider>{children}</FormProvider>
+        </Suspense>
       </body>
     </html>
   );

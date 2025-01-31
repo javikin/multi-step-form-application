@@ -19,25 +19,20 @@ const App = () => {
     }
   }, [searchParams, currentStep, updateStep]);
 
-  /*
-  useEffect(() => {
-    push(`?step=${currentStep}`);
-  }, [currentStep, push]);
-  */
-
-  if (currentStep === 0) {
-    return <WelcomePage />;
+  switch (currentStep) {
+    case 0:
+      return <WelcomePage />;
+    default:
+      if (currentStep >= 1 && currentStep <= totalSteps - 2) {
+        return <FormPage />;
+      } else if (currentStep === totalSteps - 1) {
+        return <RecommendationsPage />;
+      } else if (currentStep === totalSteps) {
+        return <SummaryPage />;
+      } else {
+        return <WelcomePage />;
+      }
   }
-
-  if (currentStep <= totalSteps - 2) {
-    return <FormPage />;
-  }
-
-  if (currentStep === totalSteps - 1) {
-    return <RecommendationsPage />;
-  }
-
-  return <SummaryPage />;
 };
 
 export default App;
